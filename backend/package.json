@@ -1,0 +1,37 @@
+{
+    "name": "appsync-sam-example",
+    "version": "1.0.0",
+    "author": "SAM CLI",
+    "license": "MIT",
+    "scripts": {
+        "lint": "eslint 'src/**/*.ts' --quiet --fix",
+        "build": "tsc",
+        "style": "prettier --write '**'",
+        "codegen": "graphql-codegen --config codegen.yml",
+        "build-resolvers": "node infra/build-resolvers.mjs",
+        "pre-push": "npm run lint && npm run build",
+        "build-all": "npm run build && npm run build-resolvers && npm run codegen"
+    },
+    "dependencies": {
+        "esbuild": "^0.17.14"
+    },
+    "devDependencies": {
+        "@aws-appsync/eslint-plugin": "^1.4.0",
+        "@aws-appsync/utils": "^1.5.0",
+        "@graphql-codegen/cli": "^5.0.0",
+        "@graphql-codegen/typescript": "^4.0.1",
+        "@types/aws-lambda": "^8.10.122",
+        "@types/node": "^18.11.4",
+        "@typescript-eslint/eslint-plugin": "^5.10.2",
+        "@typescript-eslint/parser": "^5.62.0",
+        "esbuild-plugin-eslint": "^0.3.6",
+        "eslint": "^8.8.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "glob": "^10.3.10",
+        "npm-run-all": "^4.1.5",
+        "prettier": "^2.5.1",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.8.4"
+    }
+}

@@ -1,0 +1,19 @@
+type Query {
+    post(id: ID!): Post
+}
+
+type Mutation {
+    createPost(post: PostInput!): Post!
+}
+
+type Post {
+    id: ID!
+    title: String!
+    content: String!
+    publishedAt: AWSDateTime
+}
+
+input PostInput {
+    title: String!
+    content: String!
+}

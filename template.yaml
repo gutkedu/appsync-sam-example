@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  app-sync-lambda-resolver
+
+  Sample SAM Template for app-sync-lambda-resolver
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    CodeUri: backend/
+    Runtime: nodejs18.x
+    Architectures:
+        - x86_64
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+
+  AppSyncServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "appsync.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+
+  RoleAppSyncCloudWatch:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+
+  AppSyncApi:
+    Type: "AWS::Serverless::GraphQLApi"
+    Properties:
+      Name: PostApi
+      AuthenticationType: "API_KEY"
+      XrayEnabled: true
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt RoleAppSyncCloudWatch.Arn
+        ExcludeVerboseContent: FALSE
+        FieldLogLevel: ALL
+
+  PostApiKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+
+# *** Create Post ***
+
+  CreatePostFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: backend/
+      Handler: create-post.createPostHandler
+    Metadata: 
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+        - src/lambdas/create-post.ts
+
+  CreatePostDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      Name: "CreatePostDataSource"
+      Type: "AWS_LAMBDA"
+      ServiceRoleArn: !GetAtt AppSyncServiceRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !GetAtt CreatePostFunction.Arn
+
+  CreateAddStepFunctionsResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt AppSyncApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createPost"
+      DataSourceName: !GetAtt CreatePostDataSource.Name
+
+Outputs:
+  AppSyncApiId:
+    Description: "AppSync GraphQL API ID"
+    Value: !GetAtt AppSyncApi.ApiId
+
