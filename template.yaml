@@ -1,73 +1,128 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  app-sync-lambda-resolver
+  app-sync-backend
 
-  Sample SAM Template for app-sync-lambda-resolver
-  
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    CodeUri: backend/
-    Runtime: nodejs18.x
-    Architectures:
-        - x86_64
-    Timeout: 30
+    Timeout: 3
+    Tracing: Active
     MemorySize: 256
+    CodeUri: backend
+    Architectures:
+      - x86_64
+    Runtime: nodejs18.x
 
 Resources:
-
-  AppSyncServiceRole:
-    Type: "AWS::IAM::Role"
+##########################################################################
+#                              S3 Bucket                                 #
+##########################################################################
+  S3:
+    Type: AWS::S3::Bucket
     Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - "appsync.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-
-  RoleAppSyncCloudWatch:
-    Type: AWS::IAM::Role
+      AccessControl: Private
+##########################################################################
+#                              Dynamo Table                              #
+########################################################################## 
+  Table:
+    Type: AWS::DynamoDB::Table
     Properties:
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action:
-              - sts:AssumeRole
-            Principal:
-              Service:
-                - appsync.amazonaws.com
-
-  AppSyncApi:
-    Type: "AWS::Serverless::GraphQLApi"
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: title
+          AttributeType: S
+        - AttributeName: content
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+##########################################################################
+#                              GraphQL AppSync                          #
+##########################################################################     
+  GQL:
+    Type: AWS::Serverless::GraphQLApi
     Properties:
-      Name: PostApi
-      AuthenticationType: "API_KEY"
-      XrayEnabled: true
-      LogConfig:
-        CloudWatchLogsRoleArn: !GetAtt RoleAppSyncCloudWatch.Arn
-        ExcludeVerboseContent: FALSE
-        FieldLogLevel: ALL
-
+      ApiKeys:
+        MyApiKey:
+          Description: "My API Key"
+      Auth:
+        Type: API_KEY
+      SchemaUri: ./graphql/schema.graphql
+      DataSources:
+        DynamoDb:
+          TableDataSource:
+            TableName: !Ref Table
+            TableArn: !GetAtt Table.Arn
+        Lambda:
+          ExportStoriesDataSource:
+            FunctionArn: !GetAtt ExportStoriesToCsvFunction.Arn
+      Functions:
+        createStory:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: TableDataSource
+          CodeUri: ./src/grapql/resolvers/js/create-story.resolver.js
+        getStory:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: TableDataSource
+          CodeUri: ./src/grapql/resolvers/js/get-story.resolver.js
+        exportStoriesToCsv:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ExportStoriesDataSource
+          CodeUri: ./src/grapql/resolvers/js/export-stories-to-csv.resolver.js
+      Resolvers:
+        Mutation:
+          createPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - createStory
+        Query:
+          getStory:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - getStory
+          exportStoriesToCsv:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - exportStoriesToCsv
   PostApiKey:
     Type: AWS::AppSync::ApiKey
     Properties:
       ApiId: !GetAtt AppSyncApi.ApiId
-
-# *** Create Post ***
-
-  CreatePostFunction:
+##########################################################################
+#                           Lambda Functions                             #
+##########################################################################
+  ExportStoriesToCsvFunction:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: backend/
-      Handler: create-post.createPostHandler
+      Handler: export-stories-to-csv.handler
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: S3
+          DATABASE_NAME:
+            Ref: Table
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref Table
+        - S3ReadPolicy:
+            BucketName: !Ref S3
     Metadata: 
       BuildMethod: esbuild
       BuildProperties:
@@ -75,28 +130,18 @@ Resources:
         Target: "es2020"
         Sourcemap: true
         EntryPoints: 
-        - src/lambdas/create-post.ts
-
-  CreatePostDataSource:
-    Type: "AWS::AppSync::DataSource"
-    Properties:
-      ApiId: !GetAtt AppSyncApi.ApiId
-      Name: "CreatePostDataSource"
-      Type: "AWS_LAMBDA"
-      ServiceRoleArn: !GetAtt AppSyncServiceRole.Arn
-      LambdaConfig:
-        LambdaFunctionArn: !GetAtt CreatePostFunction.Arn
-
-  CreateAddStepFunctionsResolver:
-    Type: "AWS::AppSync::Resolver"
-    Properties:
-      ApiId: !GetAtt AppSyncApi.ApiId
-      TypeName: "Mutation"
-      FieldName: "createPost"
-      DataSourceName: !GetAtt CreatePostDataSource.Name
-
+        - src/lambdas/export-stories-to-csv.ts
+        External:
+          - '@aws-sdk/client-s3'
+          - '@aws-sdk/s3-request-presigner'
+          - '@aws-sdk/client-dynamodb'
+##########################################################################
+#                           Outputs                                      #
+##########################################################################
 Outputs:
   AppSyncApiId:
     Description: "AppSync GraphQL API ID"
-    Value: !GetAtt AppSyncApi.ApiId
-
+    Value: !GetAtt GQL.ApiId
+  AppSyncGraphQLUrl:
+    Description: "AppSync GraphQL URL"
+    Value: !GetAtt GQL.GraphQLUrl

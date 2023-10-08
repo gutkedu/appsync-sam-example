@@ -4,7 +4,7 @@ version = 0.1
 
 [default]
 [default.global.parameters]
-stack_name = "app-sync-lambda-resolver"
+stack_name = "app-sync-sam-example"
 
 [default.build.parameters]
 cached = true

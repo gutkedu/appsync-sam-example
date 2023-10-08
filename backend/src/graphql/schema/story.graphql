@@ -1,0 +1,20 @@
+type Query {
+    story(id: ID!): Story
+    storiesInCsv: String
+}
+
+type Mutation {
+    createStory(input: StoryInput!): Story!
+}
+
+type Story {
+    id: ID!
+    title: String!
+    content: String!
+    createdAt: AWSDateTime
+}
+
+input StoryInput {
+    title: String!
+    content: String!
+}
