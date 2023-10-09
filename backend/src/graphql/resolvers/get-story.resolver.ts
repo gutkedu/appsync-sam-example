@@ -7,7 +7,7 @@ export function request(ctx: Context): DynamoDBGetItemRequest {
     return {
         operation: 'GetItem',
         key: util.dynamodb.toMapValues({
-            id,
+            pk: id,
         }),
     };
 }

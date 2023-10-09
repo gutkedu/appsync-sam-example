@@ -28,16 +28,10 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-        - AttributeName: title
-          AttributeType: S
-        - AttributeName: content
-          AttributeType: S
-        - AttributeName: createdAt
+        - AttributeName: pk
           AttributeType: S
       KeySchema:
-        - AttributeName: id
+        - AttributeName: pk
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 ##########################################################################
@@ -51,7 +45,7 @@ Resources:
           Description: "My API Key"
       Auth:
         Type: API_KEY
-      SchemaUri: ./graphql/schema.graphql
+      SchemaUri: ./backend/src/graphql/schema.graphql
       DataSources:
         DynamoDb:
           TableDataSource:
@@ -66,22 +60,22 @@ Resources:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./src/grapql/resolvers/js/create-story.resolver.js
+          CodeUri: ./backend/src/graphql/resolvers/js/create-story.resolver.js
         getStory:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./src/grapql/resolvers/js/get-story.resolver.js
+          CodeUri: ./backend/src/graphql/resolvers/js/get-story.resolver.js
         exportStoriesToCsv:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: ExportStoriesDataSource
-          CodeUri: ./src/grapql/resolvers/js/export-stories-to-csv.resolver.js
+          CodeUri: ./backend/src/graphql/resolvers/js/export-stories-to-csv.resolver.js
       Resolvers:
         Mutation:
-          createPost:
+          createStory:
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
@@ -100,10 +94,6 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - exportStoriesToCsv
-  PostApiKey:
-    Type: AWS::AppSync::ApiKey
-    Properties:
-      ApiId: !GetAtt AppSyncApi.ApiId
 ##########################################################################
 #                           Lambda Functions                             #
 ##########################################################################

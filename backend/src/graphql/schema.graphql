@@ -17,8 +17,8 @@ scalar AWSPhone
 scalar AWSIPAddress
 
 type Query {
-    story(id: ID!): Story
-    storiesInCsv: String
+    getStory(id: ID!): Story
+    exportStoriesToCsv: String
 }
 
 type Mutation {

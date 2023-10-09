@@ -34,11 +34,11 @@ export type MutationCreateStoryArgs = {
 
 export type Query = {
     __typename?: 'Query';
-    storiesInCsv?: Maybe<Scalars['String']['output']>;
-    story?: Maybe<Story>;
+    exportStoriesToCsv?: Maybe<Scalars['String']['output']>;
+    getStory?: Maybe<Story>;
 };
 
-export type QueryStoryArgs = {
+export type QueryGetStoryArgs = {
     id: Scalars['ID']['input'];
 };
 

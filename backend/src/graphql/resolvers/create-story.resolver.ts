@@ -12,12 +12,12 @@ export function request(ctx: Context): DynamoDBPutItemRequest {
     return {
         operation: 'PutItem',
         key: util.dynamodb.toMapValues({
-            id: util.autoId(),
+            pk: util.autoId(),
         }),
         condition: {
-            expression: 'attribute_not_exists(#id)',
+            expression: 'attribute_not_exists(#pk)',
             expressionNames: {
-                '#id': 'id',
+                '#pk': 'pk',
             },
         },
         attributeValues: util.dynamodb.toMapValues({
