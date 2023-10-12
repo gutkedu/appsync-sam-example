@@ -26,10 +26,10 @@ function request(ctx) {
 }
 function response(ctx) {
     return {
-        id: ctx.result.id,
+        id: ctx.result.pk,
         content: ctx.result.content,
         title: ctx.result.title,
-        createdAt: ctx.result.publishedAt,
+        createdAt: ctx.result.createdAt,
     };
 }
 export { request, response };

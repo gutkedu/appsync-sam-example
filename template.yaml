@@ -52,8 +52,8 @@ Resources:
             TableName: !Ref Table
             TableArn: !GetAtt Table.Arn
         Lambda:
-          ExportStoriesDataSource:
-            FunctionArn: !GetAtt ExportStoriesToCsvFunction.Arn
+          ApiProxyDataSource:
+            FunctionArn: !GetAtt ApiProxyFunction.Arn
       Functions:
         createStory:
           Runtime:
@@ -67,12 +67,12 @@ Resources:
             Version: 1.0.0
           DataSource: TableDataSource
           CodeUri: ./backend/src/graphql/resolvers/js/get-story.resolver.js
-        exportStoriesToCsv:
+        apiProxy:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
-          DataSource: ExportStoriesDataSource
-          CodeUri: ./backend/src/graphql/resolvers/js/export-stories-to-csv.resolver.js
+          DataSource: ApiProxyDataSource
+          CodeUri: ./backend/src/graphql/resolvers/js/api-proxy.resolver.js
       Resolvers:
         Mutation:
           createStory:
@@ -88,31 +88,27 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - getStory
-          exportStoriesToCsv:
+          getCoffeePhotoUrl:
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
             Pipeline:
-              - exportStoriesToCsv
+              - apiProxy
 ##########################################################################
 #                           Lambda Functions                             #
 ##########################################################################
-  ExportStoriesToCsvFunction:
+  ApiProxyFunction:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: backend/
-      Handler: export-stories-to-csv.handler
+      Handler: api-proxy.apiProxyHandler
       Environment:
         Variables:
-          BUCKET_NAME:
-            Ref: S3
           DATABASE_NAME:
             Ref: Table
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref Table
-        - S3ReadPolicy:
-            BucketName: !Ref S3
     Metadata: 
       BuildMethod: esbuild
       BuildProperties:
@@ -120,18 +116,15 @@ Resources:
         Target: "es2020"
         Sourcemap: true
         EntryPoints: 
-        - src/lambdas/export-stories-to-csv.ts
-        External:
-          - '@aws-sdk/client-s3'
-          - '@aws-sdk/s3-request-presigner'
-          - '@aws-sdk/client-dynamodb'
+        - src/lambdas/api-proxy.ts
+         
 ##########################################################################
 #                           Outputs                                      #
 ##########################################################################
 Outputs:
   AppSyncApiId:
-    Description: "AppSync GraphQL API ID"
-    Value: !GetAtt GQL.ApiId
+    Description: AppSync API Key
+    Value: !GetAtt GQLMyApiKey.ApiKey
   AppSyncGraphQLUrl:
     Description: "AppSync GraphQL URL"
     Value: !GetAtt GQL.GraphQLUrl

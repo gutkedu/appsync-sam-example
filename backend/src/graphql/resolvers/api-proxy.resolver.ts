@@ -1,4 +1,5 @@
 import { Context, LambdaRequest, util } from '@aws-appsync/utils';
+import { ApiProxyResponse } from '../../lambdas/api-proxy';
 
 export function request(): LambdaRequest {
     return {
@@ -8,8 +9,11 @@ export function request(): LambdaRequest {
 }
 
 export function response(ctx: Context): string {
-    if (!ctx.result) {
-        util.error('Story not found');
+    const { url } = ctx.result as ApiProxyResponse;
+
+    if (!url) {
+        util.error('Coffee image not found');
     }
-    return ctx.result;
+
+    return url;
 }

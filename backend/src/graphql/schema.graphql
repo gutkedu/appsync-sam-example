@@ -1,24 +1,6 @@
-scalar AWSDate
-
-scalar AWSTime
-
-scalar AWSDateTime
-
-scalar AWSTimestamp
-
-scalar AWSEmail
-
-scalar AWSJSON
-
-scalar AWSURL
-
-scalar AWSPhone
-
-scalar AWSIPAddress
-
 type Query {
+    getCoffeePhotoUrl: String
     getStory(id: ID!): Story
-    exportStoriesToCsv: String
 }
 
 type Mutation {
@@ -29,7 +11,7 @@ type Story {
     id: ID!
     title: String!
     content: String!
-    createdAt: AWSDateTime
+    createdAt: String!
 }
 
 input StoryInput {

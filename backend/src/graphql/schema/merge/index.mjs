@@ -1,9 +1,9 @@
+import fs from 'fs';
+import path from 'path';
+import { print } from 'graphql';
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import { loadFilesSync } from '@graphql-tools/load-files';
-import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { print } from 'graphql';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

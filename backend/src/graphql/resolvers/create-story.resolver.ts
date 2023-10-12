@@ -30,9 +30,9 @@ export function request(ctx: Context): DynamoDBPutItemRequest {
 
 export function response(ctx: Context): Story {
     return {
-        id: ctx.result.id,
+        id: ctx.result.pk,
         content: ctx.result.content,
         title: ctx.result.title,
-        createdAt: ctx.result.publishedAt,
+        createdAt: ctx.result.createdAt,
     };
 }

@@ -12,15 +12,6 @@ export type Scalars = {
     Boolean: { input: boolean; output: boolean };
     Int: { input: number; output: number };
     Float: { input: number; output: number };
-    AWSDate: { input: any; output: any };
-    AWSDateTime: { input: any; output: any };
-    AWSEmail: { input: any; output: any };
-    AWSIPAddress: { input: any; output: any };
-    AWSJSON: { input: any; output: any };
-    AWSPhone: { input: any; output: any };
-    AWSTime: { input: any; output: any };
-    AWSTimestamp: { input: any; output: any };
-    AWSURL: { input: any; output: any };
 };
 
 export type Mutation = {
@@ -34,7 +25,7 @@ export type MutationCreateStoryArgs = {
 
 export type Query = {
     __typename?: 'Query';
-    exportStoriesToCsv?: Maybe<Scalars['String']['output']>;
+    getCoffeePhotoUrl?: Maybe<Scalars['String']['output']>;
     getStory?: Maybe<Story>;
 };
 
@@ -45,7 +36,7 @@ export type QueryGetStoryArgs = {
 export type Story = {
     __typename?: 'Story';
     content: Scalars['String']['output'];
-    createdAt?: Maybe<Scalars['AWSDateTime']['output']>;
+    createdAt: Scalars['String']['output'];
     id: Scalars['ID']['output'];
     title: Scalars['String']['output'];
 };
@@ -54,13 +45,3 @@ export type StoryInput = {
     content: Scalars['String']['input'];
     title: Scalars['String']['input'];
 };
-
-export type AwsDate = Scalars['AWSDate'];
-export type AwsDateTime = Scalars['AWSDateTime'];
-export type AwsEmail = Scalars['AWSEmail'];
-export type AwsipAddress = Scalars['AWSIPAddress'];
-export type Awsjson = Scalars['AWSJSON'];
-export type AwsPhone = Scalars['AWSPhone'];
-export type AwsTime = Scalars['AWSTime'];
-export type AwsTimestamp = Scalars['AWSTimestamp'];
-export type Awsurl = Scalars['AWSURL'];

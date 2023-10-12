@@ -1,6 +1,5 @@
 type Query {
     getStory(id: ID!): Story
-    exportStoriesToCsv: String
 }
 
 type Mutation {
@@ -11,7 +10,7 @@ type Story {
     id: ID!
     title: String!
     content: String!
-    createdAt: AWSDateTime
+    createdAt: String!
 }
 
 input StoryInput {
