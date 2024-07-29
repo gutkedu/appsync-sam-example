@@ -1,5 +1,5 @@
 import { Context, LambdaRequest, util } from '@aws-appsync/utils';
-import { ApiProxyResponse } from '../../lambdas/api-proxy';
+import { ApiProxyResponse } from '@lambdas/api-proxy';
 
 export function request(): LambdaRequest {
     return {

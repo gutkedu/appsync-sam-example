@@ -1,0 +1,19 @@
+type Mutation {
+    createStoryComment(input: StoryCommentInput!): StoryComment!
+}
+
+type Query {
+    fetchStoryComments(storyId: ID!): [StoryComment]
+}
+
+type StoryComment {
+    id: ID!
+    storyId: ID!
+    comment: String!
+    createdAt: String!
+}
+
+input StoryCommentInput {
+    storyId: ID!
+    comment: String!
+}

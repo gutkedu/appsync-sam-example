@@ -10,7 +10,11 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "rootDir": "."
+        "rootDir": ".",
+        "paths": {
+            "@gql/*": ["./src/graphql/*"],
+            "@lambdas/*": ["./src/lambdas/*"],
+        }
     },
     "noEmit": true,
     "exclude": ["node_modules"]

@@ -8,12 +8,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const graphqlTypedefsArray = loadFilesSync(path.join(__dirname, '../'), { extensions: ['graphql'] });
+const graphqlArr = loadFilesSync(path.join(__dirname, '..', 'modules', '**'), { extensions: ['graphql'] });
 
-const mergeSchemas = mergeTypeDefs(graphqlTypedefsArray);
+const mergeSchemas = mergeTypeDefs(graphqlArr);
 const mergedSchemaString = print(mergeSchemas);
 
-const outputPath = path.join(__dirname, '../', '../', 'schema.graphql');
+const outputPath = path.join(__dirname, '../', 'schema.graphql');
 
 fs.writeFileSync(outputPath, mergedSchemaString);
 

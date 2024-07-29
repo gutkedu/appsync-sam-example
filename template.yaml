@@ -11,16 +11,13 @@ Globals:
     CodeUri: backend
     Architectures:
       - x86_64
-    Runtime: nodejs18.x
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref Table
+        NODE_OPTIONS: --enable-source-maps
 
 Resources:
-##########################################################################
-#                              S3 Bucket                                 #
-##########################################################################
-  S3:
-    Type: AWS::S3::Bucket
-    Properties:
-      AccessControl: Private
 ##########################################################################
 #                              Dynamo Table                              #
 ########################################################################## 
@@ -30,12 +27,16 @@ Resources:
       AttributeDefinitions:
         - AttributeName: pk
           AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
       KeySchema:
         - AttributeName: pk
           KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 ##########################################################################
-#                              GraphQL AppSync                          #
+#                           Serverless GraphQL AppSync                   #
 ##########################################################################     
   GQL:
     Type: AWS::Serverless::GraphQLApi
@@ -44,7 +45,11 @@ Resources:
         MyApiKey:
           Description: "My API Key"
       Auth:
-        Type: API_KEY
+        Type: AWS_LAMBDA
+        LambdaAuthorizer:
+          AuthorizerUri: !GetAtt AuthFunction.Arn
+          IdentityValidationExpression: ".*"
+          AuthorizerResultTtlInSeconds: 150
       SchemaUri: ./backend/src/graphql/schema.graphql
       DataSources:
         DynamoDb:
@@ -60,19 +65,43 @@ Resources:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/js/create-story.resolver.js
+          CodeUri: ./backend/src/graphql/resolvers/story/create-story.resolver.js
         getStory:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/js/get-story.resolver.js
-        apiProxy:
+          CodeUri: ./backend/src/graphql/resolvers/story/get-story.resolver.js
+        fetchStories:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: TableDataSource
+          CodeUri: ./backend/src/graphql/resolvers/story/fetch-stories.resolver.js
+        fetchStoryComments:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: TableDataSource
+          CodeUri: ./backend/src/graphql/resolvers/story-comment/fetch-story-comments.resolver.js
+        createStoryComment:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: TableDataSource
+          CodeUri: ./backend/src/graphql/resolvers/story-comment/create-story-comment.resolver.js
+        preCreateStoryComment:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: TableDataSource
+          CodeUri: ./backend/src/graphql/resolvers/story-comment/pre-create-story-comment.resolver.js
+        getUrlLambdaDataSource:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: ApiProxyDataSource
-          CodeUri: ./backend/src/graphql/resolvers/js/api-proxy.resolver.js
+          CodeUri: ./backend/src/graphql/resolvers/url/api-proxy.resolver.js
       Resolvers:
         Mutation:
           createStory:
@@ -81,6 +110,13 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - createStory
+          createStoryComment:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - preCreateStoryComment
+              - createStoryComment
         Query:
           getStory:
             Runtime:
@@ -88,12 +124,29 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - getStory
-          getCoffeePhotoUrl:
+              - fetchStoryComments
+          fetchStories:
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
             Pipeline:
-              - apiProxy
+              - fetchStories
+          getUrlLambdaDataSource:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - getUrlLambdaDataSource
+
+##########################################################################
+#                           Custom DataSource                            #
+##########################################################################
+
+
+
+
+
+
 ##########################################################################
 #                           Lambda Functions                             #
 ##########################################################################
@@ -102,10 +155,6 @@ Resources:
     Properties:
       CodeUri: backend/
       Handler: api-proxy.apiProxyHandler
-      Environment:
-        Variables:
-          DATABASE_NAME:
-            Ref: Table
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref Table
@@ -118,13 +167,24 @@ Resources:
         EntryPoints: 
         - src/lambdas/api-proxy.ts
          
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: auth.authHandler
+    Metadata: 
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+        - src/lambdas/auth.ts
+
 ##########################################################################
 #                           Outputs                                      #
 ##########################################################################
 Outputs:
-  AppSyncApiId:
-    Description: AppSync API Key
-    Value: !GetAtt GQLMyApiKey.ApiKey
   AppSyncGraphQLUrl:
     Description: "AppSync GraphQL URL"
     Value: !GetAtt GQL.GraphQLUrl

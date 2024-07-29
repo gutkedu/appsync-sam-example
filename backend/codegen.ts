@@ -1,12 +1,12 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-    schema: './src/graphql/schema/*.graphql',
+    schema: './src/graphql/schema.graphql',
     generates: {
         './src/graphql/types': {
             preset: 'graphql-modules',
             presetConfig: {
-                baseTypesPath: 'graphql.d.ts',
+                baseTypesPath: 'gql-types.d.ts',
             },
             plugins: ['typescript'],
         },

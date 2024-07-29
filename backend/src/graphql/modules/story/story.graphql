@@ -1,0 +1,35 @@
+type Query {
+    getStory(storyId:ID!): StoryWithComments
+    fetchStories(input:FetchStoriesInput): FetchStories
+}
+
+type Mutation {
+    createStory(input: StoryInput!): Story!
+}
+
+type StoryWithComments {
+    story: Story!
+    comments: [StoryComment]
+}   
+
+type Story {
+    id: ID!
+    title: String!
+    content: String!
+    createdAt: String!
+}
+
+type FetchStories {
+    stories: [Story]
+    nextToken: String
+}
+
+input StoryInput {
+    title: String!
+    content: String!
+}
+
+input FetchStoriesInput {
+    limit: Int
+    token: String
+}
