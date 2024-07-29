@@ -1,0 +1,30 @@
+meta {
+  name: createStory
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{base-url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: Auth
+}
+
+body:graphql {
+  mutation createStory($input:StoryInput!) {
+    createStory(input:$input) 
+  }
+}
+
+body:graphql:vars {
+  {
+    "input":{
+      "title":"Titulo",
+  "content":"Conteudo"
+    }
+  }
+}

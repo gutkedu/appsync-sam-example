@@ -1,0 +1,36 @@
+meta {
+  name: fetchStories
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{base-url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: Auth
+}
+
+body:graphql {
+  query fetchStories($input: FetchStoriesInput) {
+    fetchStories(input: $input) {
+      stories {
+        id
+        title
+        content
+        createdAt
+      }
+      nextToken
+    }
+  }
+  
+}
+
+body:graphql:vars {
+  {
+    "storyId":"2jwJu10UKSbFQIZxGwcw7r8URP1"
+  }
+}

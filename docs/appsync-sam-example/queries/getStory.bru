@@ -1,0 +1,24 @@
+meta {
+  name: getStory
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{base-url}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  query getStory($storyId: ID!) {
+    getStory(storyId: $storyId) {
+     story {
+      id,title,content,createdAt
+    }
+      comments {
+        id,storyId,comment,createdAt
+      }
+  }
+  
+}
