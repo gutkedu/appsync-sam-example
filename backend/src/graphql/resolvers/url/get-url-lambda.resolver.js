@@ -1,4 +1,4 @@
-// src/graphql/modules/url/api-proxy.resolver.ts
+// src/graphql/modules/url/get-url-lambda.resolver.ts
 import { util } from '@aws-appsync/utils';
 function request() {
     return {

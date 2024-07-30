@@ -1,55 +1,56 @@
 type Query {
-  getStory(storyId: ID!): StoryWithComments
-  fetchStories(input: FetchStoriesInput): FetchStories
-  fetchStoryComments(storyId: ID!): [StoryComment]
-  getUrlLambdaDataSource: String
+    getStory(storyId: ID!): StoryWithComments
+    fetchStories(input: FetchStoriesInput): FetchStories
+    fetchStoryComments(storyId: ID!): [StoryComment]
+    getUrlLambdaDataSource: String
+    getUrlHttpDataSource: String
 }
 
 type Mutation {
-  createStory(input: StoryInput!): Story!
-  createStoryComment(input: StoryCommentInput!): StoryComment!
+    createStory(input: StoryInput!): Story!
+    createStoryComment(input: StoryCommentInput!): StoryComment!
 }
 
 type StoryWithComments {
-  story: Story!
-  comments: [StoryComment]
+    story: Story!
+    comments: [StoryComment]
 }
 
 type Story {
-  id: ID!
-  title: String!
-  content: String!
-  createdAt: String!
+    id: ID!
+    title: String!
+    content: String!
+    createdAt: String!
 }
 
 type FetchStories {
-  stories: [Story]
-  nextToken: String
+    stories: [Story]
+    nextToken: String
 }
 
 input StoryInput {
-  title: String!
-  content: String!
+    title: String!
+    content: String!
 }
 
 input FetchStoriesInput {
-  limit: Int
-  token: String
+    limit: Int
+    token: String
 }
 
 type StoryComment {
-  id: ID!
-  storyId: ID!
-  comment: String!
-  createdAt: String!
+    id: ID!
+    storyId: ID!
+    comment: String!
+    createdAt: String!
 }
 
 input StoryCommentInput {
-  storyId: ID!
-  comment: String!
+    storyId: ID!
+    comment: String!
 }
 
 schema {
-  query: Query
-  mutation: Mutation
+    query: Query
+    mutation: Mutation
 }

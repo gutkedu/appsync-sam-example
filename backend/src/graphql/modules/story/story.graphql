@@ -1,6 +1,6 @@
 type Query {
-    getStory(storyId:ID!): StoryWithComments
-    fetchStories(input:FetchStoriesInput): FetchStories
+    getStory(storyId: ID!): StoryWithComments
+    fetchStories(input: FetchStoriesInput): FetchStories
 }
 
 type Mutation {
@@ -10,7 +10,7 @@ type Mutation {
 type StoryWithComments {
     story: Story!
     comments: [StoryComment]
-}   
+}
 
 type Story {
     id: ID!

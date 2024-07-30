@@ -7,91 +7,87 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
+    ID: { input: string; output: string };
+    String: { input: string; output: string };
+    Boolean: { input: boolean; output: boolean };
+    Int: { input: number; output: number };
+    Float: { input: number; output: number };
 };
 
 export type FetchStories = {
-  __typename?: 'FetchStories';
-  nextToken?: Maybe<Scalars['String']['output']>;
-  stories?: Maybe<Array<Maybe<Story>>>;
+    __typename?: 'FetchStories';
+    nextToken?: Maybe<Scalars['String']['output']>;
+    stories?: Maybe<Array<Maybe<Story>>>;
 };
 
 export type FetchStoriesInput = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  token?: InputMaybe<Scalars['String']['input']>;
+    limit?: InputMaybe<Scalars['Int']['input']>;
+    token?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
-  createStory: Story;
-  createStoryComment: StoryComment;
+    __typename?: 'Mutation';
+    createStory: Story;
+    createStoryComment: StoryComment;
 };
-
 
 export type MutationCreateStoryArgs = {
-  input: StoryInput;
+    input: StoryInput;
 };
 
-
 export type MutationCreateStoryCommentArgs = {
-  input: StoryCommentInput;
+    input: StoryCommentInput;
 };
 
 export type Query = {
-  __typename?: 'Query';
-  fetchStories?: Maybe<FetchStories>;
-  fetchStoryComments?: Maybe<Array<Maybe<StoryComment>>>;
-  getStory?: Maybe<StoryWithComments>;
-  getUrlLambdaDataSource?: Maybe<Scalars['String']['output']>;
+    __typename?: 'Query';
+    fetchStories?: Maybe<FetchStories>;
+    fetchStoryComments?: Maybe<Array<Maybe<StoryComment>>>;
+    getStory?: Maybe<StoryWithComments>;
+    getUrlHttpDataSource?: Maybe<Scalars['String']['output']>;
+    getUrlLambdaDataSource?: Maybe<Scalars['String']['output']>;
 };
-
 
 export type QueryFetchStoriesArgs = {
-  input?: InputMaybe<FetchStoriesInput>;
+    input?: InputMaybe<FetchStoriesInput>;
 };
-
 
 export type QueryFetchStoryCommentsArgs = {
-  storyId: Scalars['ID']['input'];
+    storyId: Scalars['ID']['input'];
 };
 
-
 export type QueryGetStoryArgs = {
-  storyId: Scalars['ID']['input'];
+    storyId: Scalars['ID']['input'];
 };
 
 export type Story = {
-  __typename?: 'Story';
-  content: Scalars['String']['output'];
-  createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  title: Scalars['String']['output'];
+    __typename?: 'Story';
+    content: Scalars['String']['output'];
+    createdAt: Scalars['String']['output'];
+    id: Scalars['ID']['output'];
+    title: Scalars['String']['output'];
 };
 
 export type StoryComment = {
-  __typename?: 'StoryComment';
-  comment: Scalars['String']['output'];
-  createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  storyId: Scalars['ID']['output'];
+    __typename?: 'StoryComment';
+    comment: Scalars['String']['output'];
+    createdAt: Scalars['String']['output'];
+    id: Scalars['ID']['output'];
+    storyId: Scalars['ID']['output'];
 };
 
 export type StoryCommentInput = {
-  comment: Scalars['String']['input'];
-  storyId: Scalars['ID']['input'];
+    comment: Scalars['String']['input'];
+    storyId: Scalars['ID']['input'];
 };
 
 export type StoryInput = {
-  content: Scalars['String']['input'];
-  title: Scalars['String']['input'];
+    content: Scalars['String']['input'];
+    title: Scalars['String']['input'];
 };
 
 export type StoryWithComments = {
-  __typename?: 'StoryWithComments';
-  comments?: Maybe<Array<Maybe<StoryComment>>>;
-  story: Story;
+    __typename?: 'StoryWithComments';
+    comments?: Maybe<Array<Maybe<StoryComment>>>;
+    story: Story;
 };
