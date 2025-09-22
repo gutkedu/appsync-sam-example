@@ -15,25 +15,25 @@
         "build-all": "run-s build build-resolvers codegen merge-schema"
     },
     "dependencies": {
-        "esbuild": "^0.23.0"
+        "esbuild": "^0.25.10"
     },
     "devDependencies": {
-        "@aws-appsync/eslint-plugin": "^1.4.0",
-        "@aws-appsync/utils": "^1.5.0",
-        "@graphql-codegen/cli": "^5.0.0",
-        "@graphql-codegen/graphql-modules-preset": "^4.0.1",
-        "@graphql-codegen/typescript": "^4.0.1",
-        "@graphql-tools/load-files": "^7.0.0",
-        "@graphql-tools/merge": "^9.0.0",
-        "@types/aws-lambda": "^8.10.122",
-        "@types/node": "^18.11.4",
+        "@aws-appsync/eslint-plugin": "^2.0.2",
+        "@aws-appsync/utils": "^2.0.3",
+        "@graphql-codegen/cli": "^6.0.0",
+        "@graphql-codegen/graphql-modules-preset": "^5.0.0",
+        "@graphql-codegen/typescript": "^5.0.0",
+        "@graphql-tools/load-files": "^7.0.1",
+        "@graphql-tools/merge": "^9.1.1",
+        "@types/aws-lambda": "^8.10.152",
+        "@types/node": "^24.5.2",
         "@typescript-eslint/eslint-plugin": "^5.10.2",
         "@typescript-eslint/parser": "^5.62.0",
         "eslint": "^8.8.0",
-        "glob": "^10.3.10",
+        "glob": "^11.0.3",
         "graphql": "^16.8.1",
         "npm-run-all": "^4.1.5",
-        "prettier": "^3.3.3",
-        "typescript": "^4.8.4"
+        "prettier": "^3.6.2",
+        "typescript": "^5.9.2"
     }
 }
