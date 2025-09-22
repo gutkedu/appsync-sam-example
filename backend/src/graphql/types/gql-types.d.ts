@@ -42,7 +42,6 @@ export type MutationCreateStoryCommentArgs = {
 export type Query = {
     __typename?: 'Query';
     fetchStories?: Maybe<FetchStories>;
-    fetchStoryComments?: Maybe<Array<Maybe<StoryComment>>>;
     getStory?: Maybe<StoryWithComments>;
     getUrlHttpDataSource?: Maybe<Scalars['String']['output']>;
     getUrlLambdaDataSource?: Maybe<Scalars['String']['output']>;
@@ -50,10 +49,6 @@ export type Query = {
 
 export type QueryFetchStoriesArgs = {
     input?: InputMaybe<FetchStoriesInput>;
-};
-
-export type QueryFetchStoryCommentsArgs = {
-    storyId: Scalars['ID']['input'];
 };
 
 export type QueryGetStoryArgs = {

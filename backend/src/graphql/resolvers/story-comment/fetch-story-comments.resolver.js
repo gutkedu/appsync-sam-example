@@ -26,7 +26,7 @@ function response(ctx) {
             id: item.sk.split('#')[1],
             comment: item.comment,
             createdAt: item.createdAt,
-            storyId: item.pk.split('#')[1],
+            storyId: item.storyId,
         })),
     };
 }
