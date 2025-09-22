@@ -7,18 +7,34 @@ meta {
 post {
   url: {{base-url}}
   body: graphql
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: Auth
 }
 
 body:graphql {
   query getStory($storyId: ID!) {
     getStory(storyId: $storyId) {
-     story {
-      id,title,content,createdAt
-    }
-      comments {
-        id,storyId,comment,createdAt
+      story {
+        id
+        title
+        content
+        createdAt
       }
+      comments {
+        id
+        storyId
+        comment
+        createdAt
+      }
+    }
   }
-  
+}
+
+body:graphql:vars {
+  {
+    "storyId": "story-id-here"
+  }
 }

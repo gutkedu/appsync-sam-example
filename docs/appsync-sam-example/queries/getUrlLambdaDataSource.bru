@@ -7,13 +7,15 @@ meta {
 post {
   url: {{base-url}}
   body: graphql
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: Auth
 }
 
 body:graphql {
   query getUrlLambdaDataSource {
-    getUrlLambdaDataSource{
-      url
-    }
-  
+    getUrlLambdaDataSource
+  }
 }

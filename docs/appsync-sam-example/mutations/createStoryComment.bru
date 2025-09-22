@@ -15,11 +15,11 @@ auth:bearer {
 }
 
 body:graphql {
-  mutation createStory($input: StoryInput!) {
-    createStory(input: $input) {
+  mutation createStoryComment($input: StoryCommentInput!) {
+    createStoryComment(input: $input) {
       id
-      title
-      content
+      storyId
+      comment
       createdAt
     }
   }
@@ -29,8 +29,8 @@ body:graphql {
 body:graphql:vars {
   {
     "input":{
-      "title":"Titulo",
-  "content":"Conteudo"
+      "storyId":"333gqB0UW3WEFX0Sqi9401ASlei",
+      "comment":"This is a sample comment"
     }
   }
 }

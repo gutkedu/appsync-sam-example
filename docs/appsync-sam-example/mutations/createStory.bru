@@ -15,15 +15,21 @@ auth:bearer {
 }
 
 body:graphql {
-  mutation createStory($input:StoryInput!) {
-    createStory(input:$input) 
+  mutation createStory($input: StoryInput!) {
+    createStory(input: $input) {
+      id,
+      title,
+      content,
+      createdAt
+    }
   }
+  
 }
 
 body:graphql:vars {
   {
     "input":{
-      "title":"Titulo",
+  "title":"Titulo",
   "content":"Conteudo"
     }
   }
