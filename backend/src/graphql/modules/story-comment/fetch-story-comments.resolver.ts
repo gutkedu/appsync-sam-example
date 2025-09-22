@@ -32,7 +32,7 @@ export function response(ctx: Context): StoryWithComments {
             id: item.sk.split('#')[1],
             comment: item.comment,
             createdAt: item.createdAt,
-            storyId: item.storyId,
+            storyId: item.pk.split('#')[1],
         })),
     };
 }
