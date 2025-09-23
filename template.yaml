@@ -59,6 +59,8 @@ Resources:
         Lambda:
           ApiProxyDataSource:
             FunctionArn: !GetAtt ApiProxyFunction.Arn
+          EventPublisherLambdaDataSource:
+            FunctionArn: !GetAtt EventPublisherFunction.Arn
       Functions:
         createStory:
           Runtime:
@@ -108,6 +110,18 @@ Resources:
             Version: 1.0.0
           DataSource: !GetAtt HttpApiDataSource.Name
           CodeUri: ./backend/src/graphql/resolvers/url/get-url-http-datasource.resolver.js
+        publishStoryCreatedEvent:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: EventPublisherLambdaDataSource
+          CodeUri: ./backend/src/graphql/resolvers/events/publish-story-created.resolver.js
+        publishCommentCreatedEvent:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: EventPublisherLambdaDataSource
+          CodeUri: ./backend/src/graphql/resolvers/events/publish-comment-created.resolver.js
       Resolvers:
         Mutation:
           createStory:
@@ -116,6 +130,7 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - createStory
+              - publishStoryCreatedEvent
           createStoryComment:
             Runtime:
               Name: APPSYNC_JS
@@ -123,6 +138,7 @@ Resources:
             Pipeline:
               - preCreateStoryComment
               - createStoryComment
+              - publishCommentCreatedEvent
         Query:
           getStory:
             Runtime:
@@ -144,11 +160,40 @@ Resources:
             Pipeline:
               - getUrlLambdaDataSource
           getUrlHttpDataSource:
-            Runtime:
+            Runtime:  
               Name: APPSYNC_JS
               Version: 1.0.0
             Pipeline:
               - getUrlHttpDataSource
+
+##########################################################################
+#                           AppSync Event API                            #
+##########################################################################
+  EventAPI:
+    Type: AWS::AppSync::Api
+    Properties:
+      Name: GQL-EventAPI
+      EventConfig:
+        AuthProviders:
+          - AuthType: API_KEY
+        ConnectionAuthModes:
+          - AuthType: API_KEY
+        DefaultPublishAuthModes:
+          - AuthType: API_KEY
+        DefaultSubscribeAuthModes:
+          - AuthType: API_KEY
+
+  EventApiNameSpace:
+    Type: AWS::AppSync::ChannelNamespace
+    Properties:
+      ApiId: !GetAtt EventAPI.ApiId
+      Name: 'default'
+
+  EventAPIKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt EventAPI.ApiId
+      Description: API Key for Events API
 
 ##########################################################################
 #                           Custom DataSource                            #
@@ -196,6 +241,32 @@ Resources:
         EntryPoints: 
         - src/lambdas/auth.ts
 
+  EventPublisherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: event-publisher.eventPublisherHandler
+      Environment:
+        Variables:
+          EVENT_API_ENDPOINT: !Sub "https://${EventAPI.Dns.Http}/event"
+          EVENT_API_KEY: !GetAtt EventAPIKey.ApiKey
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - appsync:PostToConnection
+              Resource: 
+                - !Sub "arn:aws:appsync:${AWS::Region}:${AWS::AccountId}:apis/${EventAPI}/*"
+    Metadata: 
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+        - src/lambdas/event-publisher.ts
+
 ##########################################################################
 #                           Outputs                                      #
 ##########################################################################
@@ -203,3 +274,20 @@ Outputs:
   AppSyncGraphQLUrl:
     Description: "AppSync GraphQL URL"
     Value: !GetAtt GQL.GraphQLUrl
+    
+  EventApiHttpURL:
+    Description: "AppSync Event API HTTP URL"
+    Value: !Sub "https://${EventAPI.Dns.Http}/event"
+    
+  EventApiWebSocketURL:
+    Description: "AppSync Event API WebSocket URL"
+    Value: !Sub "wss://${EventAPI.Dns.Http}/event/realtime"
+    
+  EventApiKey:
+    Description: "AppSync Event API Key"
+    Value: !GetAtt EventAPIKey.ApiKey
+    
+  EventApiId:
+    Description: "AppSync Event API ID"
+    Value: !Ref EventAPI
+
