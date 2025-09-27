@@ -110,6 +110,18 @@ Resources:
             Version: 1.0.0
           DataSource: !GetAtt HttpApiDataSource.Name
           CodeUri: ./backend/src/graphql/resolvers/url/get-url-http-datasource.resolver.js
+        getWeatherInfo:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: !GetAtt WeatherHttpDataSource.Name
+          CodeUri: ./backend/src/graphql/resolvers/location/get-weather.resolver.js
+        getIpLocation:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: !GetAtt IpHttpDataSource.Name
+          CodeUri: ./backend/src/graphql/resolvers/location/get-ip-location.resolver.js
         publishStoryCreatedEvent:
           Runtime:
             Name: APPSYNC_JS
@@ -165,6 +177,13 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - getUrlHttpDataSource
+          getIpWeatherInfo:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - getIpLocation
+              - getWeatherInfo
 
 ##########################################################################
 #                           AppSync Event API                            #
@@ -206,6 +225,24 @@ Resources:
       Type: HTTP
       HttpConfig:
         Endpoint: "https://coffee.alexflipnote.dev"
+
+  WeatherHttpDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt GQL.ApiId
+      Name: "WeatherHttpDataSource"
+      Type: HTTP
+      HttpConfig:
+        Endpoint: "https://api.open-meteo.com"
+
+  IpHttpDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt GQL.ApiId
+      Name: "IpHttpDataSource"
+      Type: HTTP
+      HttpConfig:
+        Endpoint: "https://api.ip2location.io"
 
 ##########################################################################
 #                           Lambda Functions                             #

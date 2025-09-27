@@ -1,6 +1,4 @@
 type Query {
-    getUrlLambdaDataSource: String
-    getUrlHttpDataSource: String
     getIpWeatherInfo(input: IpInput!): IpWeatherInfo
 }
 

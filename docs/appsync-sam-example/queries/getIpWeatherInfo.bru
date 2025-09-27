@@ -1,0 +1,56 @@
+meta {
+  name: getIpWeatherInfo
+  type: graphql
+  seq: 6
+}
+
+post {
+  url: {{base-url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: Auth
+}
+
+body:graphql {
+  query getIpWeatherInfo($input: IpInput!) {
+    getIpWeatherInfo(input: $input) {
+      ipInfo {
+        ip
+        country_name
+        region_name
+        city_name
+        latitude
+        longitude
+      }
+      weather {
+        latitude
+        longitude
+        timezone
+        elevation
+        current_units {
+          time
+          interval
+          temperature_2m
+          wind_speed_10m
+        }
+        current {
+          time
+          interval
+          temperature_2m
+          wind_speed_10m
+        }
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "ip": "202.35.228.62"
+    }
+  }
+}

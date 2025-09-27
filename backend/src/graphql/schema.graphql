@@ -1,8 +1,56 @@
 type Query {
+    getIpWeatherInfo(input: IpInput!): IpWeatherInfo
     getStory(storyId: ID!): StoryWithComments
     fetchStories(input: FetchStoriesInput): FetchStories
     getUrlLambdaDataSource: String
     getUrlHttpDataSource: String
+}
+
+input IpInput {
+    ip: String!
+}
+
+type IpWeatherInfo {
+    ipInfo: IpInfo
+    weather: WeatherInfo
+}
+
+type IpInfo {
+    ip: String
+    country_code: String
+    country_name: String
+    region_name: String
+    city_name: String
+    latitude: Float
+    longitude: Float
+    zip_code: String
+    time_zone: String
+}
+
+type WeatherInfo {
+    latitude: Float
+    longitude: Float
+    generationtime_ms: Float
+    utc_offset_seconds: Int
+    timezone: String
+    timezone_abbreviation: String
+    elevation: Int
+    current_units: CurrentUnits
+    current: Current
+}
+
+type CurrentUnits {
+    time: String
+    interval: String
+    temperature_2m: String
+    wind_speed_10m: String
+}
+
+type Current {
+    time: String
+    interval: Int
+    temperature_2m: Float
+    wind_speed_10m: Float
 }
 
 type Mutation {
