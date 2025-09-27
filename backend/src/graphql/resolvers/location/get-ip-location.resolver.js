@@ -17,6 +17,10 @@ function response(ctx) {
         util.error(ctx.error.message);
     }
     const parsedBody = JSON.parse(ctx.result.body);
-    return parsedBody;
+    return {
+        ipInfo: parsedBody,
+        weather: {},
+        sendEvent: ctx.args.input.sendEvent || false,
+    };
 }
 export { request, response };

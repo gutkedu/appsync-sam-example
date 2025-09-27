@@ -56,11 +56,13 @@ export type IpInfo = {
 
 export type IpInput = {
     ip: Scalars['String']['input'];
+    sendEvent?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type IpWeatherInfo = {
     __typename?: 'IpWeatherInfo';
     ipInfo?: Maybe<IpInfo>;
+    sendEvent?: Maybe<Scalars['Boolean']['output']>;
     weather?: Maybe<WeatherInfo>;
 };
 

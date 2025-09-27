@@ -110,7 +110,7 @@ Resources:
             Version: 1.0.0
           DataSource: !GetAtt HttpApiDataSource.Name
           CodeUri: ./backend/src/graphql/resolvers/url/get-url-http-datasource.resolver.js
-        getWeatherInfo:
+        getWeather:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
@@ -134,6 +134,12 @@ Resources:
             Version: 1.0.0
           DataSource: EventPublisherLambdaDataSource
           CodeUri: ./backend/src/graphql/resolvers/events/publish-comment-created.resolver.js
+        publishLocationSearchedEvent:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: EventPublisherLambdaDataSource
+          CodeUri: ./backend/src/graphql/resolvers/events/publish-location-searched.resolver.js
       Resolvers:
         Mutation:
           createStory:
@@ -183,7 +189,8 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - getIpLocation
-              - getWeatherInfo
+              - getWeather
+              - publishLocationSearchedEvent
 
 ##########################################################################
 #                           AppSync Event API                            #

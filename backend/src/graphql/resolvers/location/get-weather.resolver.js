@@ -2,8 +2,8 @@
 import { util } from '@aws-appsync/utils';
 function request(ctx) {
     const ipInfo = ctx.prev.result;
-    const latitude = ipInfo.latitude;
-    const longitude = ipInfo.longitude;
+    const latitude = ipInfo.ipInfo?.latitude;
+    const longitude = ipInfo.ipInfo?.longitude;
     if (!latitude || !longitude) {
         util.error('Latitude or Longitude not found');
     }
@@ -25,8 +25,9 @@ function response(ctx) {
     }
     const parsedBody = JSON.parse(ctx.result.body);
     return {
-        ipInfo: ctx.prev.result,
+        ipInfo: ctx.prev.result.ipInfo,
         weather: parsedBody,
+        sendEvent: ctx.prev.result.sendEvent || false,
     };
 }
 export { request, response };

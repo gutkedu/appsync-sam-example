@@ -8,11 +8,13 @@ type Query {
 
 input IpInput {
     ip: String!
+    sendEvent: Boolean
 }
 
 type IpWeatherInfo {
     ipInfo: IpInfo
     weather: WeatherInfo
+    sendEvent: Boolean
 }
 
 type IpInfo {

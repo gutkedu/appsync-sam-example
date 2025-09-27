@@ -8,10 +8,10 @@ interface WeatherQueryParams {
 }
 
 export function request(ctx: Context): HTTPRequest<string> {
-    const ipInfo = ctx.prev.result as IpInfo;
+    const ipInfo = ctx.prev.result as IpWeatherInfo;
 
-    const latitude = ipInfo.latitude;
-    const longitude = ipInfo.longitude;
+    const latitude = ipInfo.ipInfo?.latitude;
+    const longitude = ipInfo.ipInfo?.longitude;
 
     if (!latitude || !longitude) {
         util.error('Latitude or Longitude not found');
@@ -36,8 +36,10 @@ export function response(ctx: Context): IpWeatherInfo {
     }
 
     const parsedBody = JSON.parse(ctx.result.body) as WeatherInfo;
+
     return {
-        ipInfo: ctx.prev.result as IpInfo,
+        ipInfo: ctx.prev.result.ipInfo as IpInfo,
         weather: parsedBody,
+        sendEvent: ctx.prev.result.sendEvent || false,
     };
 }

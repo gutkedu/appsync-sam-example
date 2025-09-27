@@ -1,5 +1,5 @@
 import { Context, HTTPRequest, util } from '@aws-appsync/utils';
-import { IpInput, IpInfo } from '../../types/gql-types';
+import { IpInput, IpInfo, IpWeatherInfo } from '../../types/gql-types';
 
 interface QueryParams {
     ip: string;
@@ -19,11 +19,16 @@ export function request(ctx: Context): HTTPRequest<string> {
     };
 }
 
-export function response(ctx: Context): IpInfo {
+export function response(ctx: Context): IpWeatherInfo {
     if (ctx.error) {
         util.error(ctx.error.message);
     }
 
     const parsedBody = JSON.parse(ctx.result.body) as IpInfo;
-    return parsedBody;
+
+    return {
+        ipInfo: parsedBody,
+        weather: {},
+        sendEvent: ctx.args.input.sendEvent || false,
+    };
 }
