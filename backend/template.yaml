@@ -8,10 +8,10 @@ Globals:
     Timeout: 3
     Tracing: Active
     MemorySize: 256
-    CodeUri: backend
+    CodeUri: .
     Architectures:
-      - x86_64
-    Runtime: nodejs20.x
+      - arm64
+    Runtime: nodejs22.x
     Environment:
       Variables:
         TABLE_NAME: !Ref Table
@@ -50,7 +50,7 @@ Resources:
           AuthorizerUri: !GetAtt AuthFunction.Arn
           IdentityValidationExpression: ".*"
           AuthorizerResultTtlInSeconds: 500
-      SchemaUri: ./backend/src/graphql/schema.graphql
+      SchemaUri: ./src/graphql/schema.graphql
       DataSources:
         DynamoDb:
           TableDataSource:
@@ -67,79 +67,79 @@ Resources:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/story/create-story.resolver.js
+          CodeUri: ./src/graphql/resolvers/story/create-story.resolver.js
         getStory:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/story/get-story.resolver.js
+          CodeUri: ./src/graphql/resolvers/story/get-story.resolver.js
         fetchStories:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/story/fetch-stories.resolver.js
+          CodeUri: ./src/graphql/resolvers/story/fetch-stories.resolver.js
         fetchStoryComments:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/story-comment/fetch-story-comments.resolver.js
+          CodeUri: ./src/graphql/resolvers/story-comment/fetch-story-comments.resolver.js
         createStoryComment:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/story-comment/create-story-comment.resolver.js
+          CodeUri: ./src/graphql/resolvers/story-comment/create-story-comment.resolver.js
         preCreateStoryComment:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: TableDataSource
-          CodeUri: ./backend/src/graphql/resolvers/story-comment/pre-create-story-comment.resolver.js
+          CodeUri: ./src/graphql/resolvers/story-comment/pre-create-story-comment.resolver.js
         getUrlLambdaDataSource:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: ApiProxyDataSource
-          CodeUri: ./backend/src/graphql/resolvers/url/get-url-lambda.resolver.js
+          CodeUri: ./src/graphql/resolvers/url/get-url-lambda.resolver.js
         getUrlHttpDataSource:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: !GetAtt HttpApiDataSource.Name
-          CodeUri: ./backend/src/graphql/resolvers/url/get-url-http-datasource.resolver.js
+          CodeUri: ./src/graphql/resolvers/url/get-url-http-datasource.resolver.js
         getWeather:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: !GetAtt WeatherHttpDataSource.Name
-          CodeUri: ./backend/src/graphql/resolvers/location/get-weather.resolver.js
+          CodeUri: ./src/graphql/resolvers/location/get-weather.resolver.js
         getIpLocation:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: !GetAtt IpHttpDataSource.Name
-          CodeUri: ./backend/src/graphql/resolvers/location/get-ip-location.resolver.js
+          CodeUri: ./src/graphql/resolvers/location/get-ip-location.resolver.js
         publishStoryCreatedEvent:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: EventPublisherLambdaDataSource
-          CodeUri: ./backend/src/graphql/resolvers/events/publish-story-created.resolver.js
+          CodeUri: ./src/graphql/resolvers/events/publish-story-created.resolver.js
         publishCommentCreatedEvent:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: EventPublisherLambdaDataSource
-          CodeUri: ./backend/src/graphql/resolvers/events/publish-comment-created.resolver.js
+          CodeUri: ./src/graphql/resolvers/events/publish-comment-created.resolver.js
         publishLocationSearchedEvent:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: EventPublisherLambdaDataSource
-          CodeUri: ./backend/src/graphql/resolvers/events/publish-location-searched.resolver.js
+          CodeUri: ./src/graphql/resolvers/events/publish-location-searched.resolver.js
       Resolvers:
         Mutation:
           createStory:
@@ -257,7 +257,6 @@ Resources:
   ApiProxyFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: backend/
       Handler: api-proxy.apiProxyHandler
       Policies:
         - DynamoDBReadPolicy:
@@ -274,7 +273,6 @@ Resources:
   AuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: backend/
       Handler: auth.authHandler
     Metadata: 
       BuildMethod: esbuild
@@ -288,7 +286,6 @@ Resources:
   EventPublisherFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: backend/
       Handler: event-publisher.eventPublisherHandler
       Environment:
         Variables:

@@ -44,7 +44,7 @@ The application consists of:
    ```bash
    git clone <repository-url>
    cd appsync-sam-example
-   cd backend && npm install && cd ..
+   cd backend && npm install
    ```
 
 2. **Build the application:**
